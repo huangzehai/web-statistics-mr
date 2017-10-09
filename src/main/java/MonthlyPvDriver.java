@@ -1,10 +1,13 @@
 import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.mapreduce.lib.output.MultipleOutputs;
+import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
@@ -31,6 +34,15 @@ public class MonthlyPvDriver extends Configured implements Tool {
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(LongWritable.class);
+
+
+        // Defines additional sequence-file based output 'sequence' for the job
+        MultipleOutputs.addNamedOutput(job, "201710",
+                TextOutputFormat.class,
+                Text.class, NullWritable.class);
+        MultipleOutputs.addNamedOutput(job, "201709",
+                TextOutputFormat.class,
+                Text.class, NullWritable.class);
         return job.waitForCompletion(true) ? 0 : 1;
     }
 }
