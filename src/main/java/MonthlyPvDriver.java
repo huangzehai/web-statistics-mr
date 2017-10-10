@@ -32,7 +32,8 @@ public class MonthlyPvDriver extends Configured implements Tool {
             return -1;
         }
 
-        Job job = Job.getInstance();
+        //获取运行时参数
+        Job job = Job.getInstance(getConf());
         job.setJarByClass(getClass());
         job.setMapperClass(MonthlyPvMapper.class);
         job.setReducerClass(MonthlyPvReducer.class);
