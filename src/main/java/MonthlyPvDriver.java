@@ -11,7 +11,14 @@ import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 public class MonthlyPvDriver extends Configured implements Tool {
+    private static final String DATE_FORMAT = "yyyyMM";
+
     public static void main(String[] args) throws Exception {
         int exitCode = ToolRunner.run(new MonthlyPvDriver(), args);
         System.exit(exitCode);
@@ -37,12 +44,17 @@ public class MonthlyPvDriver extends Configured implements Tool {
 
 
         // Defines additional sequence-file based output 'sequence' for the job
-        MultipleOutputs.addNamedOutput(job, "201710",
-                TextOutputFormat.class,
-                Text.class, NullWritable.class);
-        MultipleOutputs.addNamedOutput(job, "201709",
-                TextOutputFormat.class,
-                Text.class, NullWritable.class);
+        Calendar calendar = Calendar.getInstance();
+        //Set start date.
+        calendar.set(2017, 0, 1, 0, 0, 0);
+        Date today = new Date();
+        DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+        while (calendar.getTime().before(today)) {
+            MultipleOutputs.addNamedOutput(job, df.format(calendar.getTime()),
+                    TextOutputFormat.class,
+                    Text.class, NullWritable.class);
+            calendar.add(Calendar.MONTH, 1);
+        }
         return job.waitForCompletion(true) ? 0 : 1;
     }
 }
